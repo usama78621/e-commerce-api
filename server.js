@@ -13,8 +13,10 @@ const authRouter = require("./routes/authRoutes");
 // middleware
 const errorHandlerMiddleware = require("./middleware/error-handler");
 const notFound = require("./middleware/not-found");
+const cookieParser = require("cookie-parser");
 // express incomeing req and res in json
 app.use(express.json());
+app.use(cookieParser(process.env.JWT_SECRET));
 
 app.use("/api/v1/auth", authRouter);
 
