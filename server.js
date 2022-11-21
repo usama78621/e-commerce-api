@@ -8,8 +8,19 @@ require("express-async-errors");
 // import connect file DB
 const connectDB = require("./db/connect");
 
+const authRouter = require("./routes/authRoutes");
+
+// middleware
+const errorHandlerMiddleware = require("./middleware/error-handler");
+const notFound = require("./middleware/not-found");
 // express incomeing req and res in json
 app.use(express.json());
+
+app.use("/api/v1/auth", authRouter);
+
+// not found page
+app.use(notFound);
+app.use(errorHandlerMiddleware);
 
 // env var
 const port = process.env.PORT || 5000;
