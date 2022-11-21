@@ -9,6 +9,7 @@ require("express-async-errors");
 const connectDB = require("./db/connect");
 
 const authRouter = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 // middleware
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", userRoutes);
 
 // not found page
 app.use(notFound);
