@@ -1,11 +1,7 @@
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
-const {
-  createJWT,
-  isValidToken,
-  attachCookiesToRosponse,
-} = require("../utils");
+const { attachCookiesToResponse, createTokenUser } = require("../utils");
 
 const register = async (req, res) => {
   const { email } = req.body;
@@ -14,8 +10,8 @@ const register = async (req, res) => {
     throw new CustomError.BadRequestError("Email Already Exists");
   }
   const user = await User.create(req.body);
-  const tokenUser = { userId: user._id, role: user.role };
-  attachCookiesToRosponse({ res, user: tokenUser });
+  const tokenUser = createTokenUser(user);
+  attachCookiesToResponse({ res, user: tokenUser });
   res.status(StatusCodes.CREATED).json({ user: tokenUser });
 };
 
@@ -32,14 +28,14 @@ const login = async (req, res) => {
   if (!isPasswordCorrect) {
     throw new CustomError.UnauthenticatedError("Invalid credentials");
   }
-  const tokenUser = { userId: user._id, role: user.role };
-  attachCookiesToRosponse({ res, user: tokenUser });
+  const tokenUser = createTokenUser(user);
+  attachCookiesToResponse({ res, user: tokenUser });
   res.status(StatusCodes.OK).json({ user: tokenUser });
 };
 const logout = (req, res) => {
   res.cookie("token", "logout", {
     httpOnly: true,
-    expires: new Date(Date.now() + 5 * 1000),
+    expires: new Date(Date.now()),
   });
   res.send("user Logout");
 };

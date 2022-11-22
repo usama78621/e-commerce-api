@@ -16,16 +16,41 @@ const getSingleUser = async (req, res) => {
   res.status(StatusCodes.OK).json({ user });
 };
 
-const updateUser = (req, res) => {
-  res.send("update user");
+const updateUser = async (req, res) => {
+  const { email, name } = req.body;
+  if (!email || !name) {
+    throw new CustomError.BadRequestError("Please provide all values");
+  }
+  const user = await User.findByIdAndUpdate(
+    { _id: req.user.userId },
+    req.body,
+    { new: true, runValidators: true }
+  );
+  res.status(StatusCodes.OK).json({ user });
 };
 
-const showCurrentUser = (req, res) => {
-  res.send("Show Current User");
+const showCurrentUser = async (req, res) => {
+  const user = await User.findOne({ _id: req.user.userId }).select("-password");
+  if (!user) {
+    throw new CustomError.UnauthenticatedError("Authentication Invalid");
+  }
+  res.status(StatusCodes.OK).json({ user });
 };
 
-const updateUserPassword = (req, res) => {
-  res.send("Update user Password");
+const updateUserPassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword) {
+    throw new CustomError.BadRequestError("Please provide both values");
+  }
+  const user = await User.findOne({ _id: req.user.userId });
+
+  const isPasswordCorrect = await user.comparePassword(oldPassword);
+  if (!isPasswordCorrect) {
+    throw new CustomError.UnauthenticatedError("Invalid Credentials");
+  }
+  user.password = newPassword;
+  await user.save();
+  res.status(StatusCodes.OK).json({ msg: "Success! password update" });
 };
 
 module.exports = {

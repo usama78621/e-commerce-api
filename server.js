@@ -1,10 +1,9 @@
+require("express-async-errors");
+require("dotenv").config();
 const express = require("express");
 const app = express();
-const dotenv = require("dotenv");
-dotenv.config();
 
 // error handler evoid use of try catch balog
-require("express-async-errors");
 // import connect file DB
 const connectDB = require("./db/connect");
 
