@@ -1,6 +1,11 @@
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors");
+const {
+  checkPermission,
+  createTokenUser,
+  attachCookiesToResponse,
+} = require("../utils");
 
 const getAllUsers = async (req, res) => {
   const users = await User.find({ role: "user" }).select("-password");
@@ -13,6 +18,7 @@ const getSingleUser = async (req, res) => {
       `user not found this ${req.params.id} `
     );
   }
+  checkPermission(req.user, user._id);
   res.status(StatusCodes.OK).json({ user });
 };
 
@@ -23,9 +29,11 @@ const updateUser = async (req, res) => {
   }
   const user = await User.findByIdAndUpdate(
     { _id: req.user.userId },
-    req.body,
+    { email, name },
     { new: true, runValidators: true }
-  );
+  ).select("-password");
+  const tokenUser = createTokenUser(user);
+  attachCookiesToResponse({ res, user: tokenUser });
   res.status(StatusCodes.OK).json({ user });
 };
 
