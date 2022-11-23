@@ -23,7 +23,11 @@ const deleteProduct = async (req, res) => {
 };
 
 const uploadImage = async (req, res) => {
+  if (!req.files) {
+    throw new CustomApi.BadRequestError("Provide images");
+  }
   let images = req.files.image;
+  console.log(images);
   let urls = [];
   for (let i = 0; i < images.length; i++) {
     const element = images[i];
