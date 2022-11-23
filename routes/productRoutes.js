@@ -1,4 +1,5 @@
 const express = require("express");
+const { array } = require("joi");
 const router = express.Router();
 const multer = require("multer");
 const upload = multer();
@@ -20,7 +21,9 @@ router
   .post([authenticateUser, authorizePermission("admin")], createProduct)
   .get(getAllProducts);
 
-router.post("/uploadImage", upload.array("image"), uploadImage);
+router
+  .route("/uploadImage")
+  .post([authenticateUser, authorizePermission("admin")], uploadImage);
 
 router
   .route("/:id")

@@ -21,22 +21,19 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   res.send("Delete Products");
 };
+
 const uploadImage = async (req, res) => {
-  console.log(req.files);
+  let images = req.files.image;
   let urls = [];
-  // for (let i = 0; i < req.files.length; i++) {
-  //   const element = array[i];
-  //   console.log("element =>", element);
-  //   const result = await cloudinary.uploader.upload(
-  //     req.files.image.tempFilePath,
-  //     {
-  //       use_filename: true,
-  //       folder: "file-upload",
-  //     }
-  //   );
-  //   urls.push(result);
-  //   fs.unlinkSync(req.files.image.tempFilePath);
-  // }
+  for (let i = 0; i < images.length; i++) {
+    const element = images[i];
+    const result = await cloudinary.uploader.upload(element.tempFilePath, {
+      use_filename: true,
+      folder: "images",
+    });
+    urls.push({ src: result.secure_url, id: result.asset_id });
+    fs.unlinkSync(element.tempFilePath);
+  }
   res.status(StatusCodes.OK).json({ urls });
 };
 

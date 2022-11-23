@@ -2,6 +2,7 @@ require("express-async-errors");
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const cors = require("cors");
 
 // error handler evoid use of try catch balog
 // import connect file DB
@@ -12,7 +13,7 @@ const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 
 // cloudinary
-// const fileUpload = require('express-fileupload');
+const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -27,7 +28,8 @@ const cookieParser = require("cookie-parser");
 // express incomeing req and res in json
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
-// app.use(fileUpload({ useTempFiles: true }));
+app.use(cors());
+app.use(fileUpload({ useTempFiles: true }));
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRoutes);
