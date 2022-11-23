@@ -11,6 +11,15 @@ const authRouter = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 
+// cloudinary
+// const fileUpload = require('express-fileupload');
+const cloudinary = require("cloudinary").v2;
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
+
 // middleware
 const errorHandlerMiddleware = require("./middleware/error-handler");
 const notFound = require("./middleware/not-found");
@@ -18,11 +27,11 @@ const cookieParser = require("cookie-parser");
 // express incomeing req and res in json
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
+// app.use(fileUpload({ useTempFiles: true }));
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/products", productRoutes);
-
 
 // not found page
 app.use(notFound);
