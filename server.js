@@ -9,6 +9,7 @@ const connectDB = require("./db/connect");
 
 const authRouter = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const productRoutes = require("./routes/productRoutes");
 
 // middleware
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -20,6 +21,8 @@ app.use(cookieParser(process.env.JWT_SECRET));
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/products", productRoutes);
+
 
 // not found page
 app.use(notFound);

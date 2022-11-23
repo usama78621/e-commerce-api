@@ -18,7 +18,6 @@ const authenticateUser = async (req, res, next) => {
 };
 
 const authorizePermission = (...role) => {
-  console.log(role);
   return (req, res, next) => {
     if (!role.includes(req.user.role)) {
       throw new CustomError.UnauthorizedError(
