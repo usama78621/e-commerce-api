@@ -1,5 +1,5 @@
 const Product = require("../models/Product");
-const CustomApi = require("../errors");
+const CustomError = require("../errors");
 const { StatusCodes } = require("http-status-codes");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
@@ -10,27 +10,70 @@ const createProduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  res.send("Get All Products");
+  const products = await Product.find({});
+
+  res.status(StatusCodes.OK).json({ products, count: products.length });
 };
 const getSingleProduct = async (req, res) => {
-  res.send("Get Single Products");
+  const { id: productId } = req.params;
+  const product = await Product.findOne({ _id: productId }).populate("reviews")
+  if (!product) {
+    throw new CustomError.NotFoundError(`No product with id : ${productId}`);
+  }
+  res.status(StatusCodes.OK).json({ product });
 };
+
+
 const updateProduct = async (req, res) => {
-  res.send("update product Products");
+  const { id: productId } = req.params;
+  console.log(req.body);
+  const product = await Product.findOneAndUpdate({ _id: productId }, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!product) {
+    throw new CustomError.NotFoundError(`No product with id : ${productId}`);
+  }
+  res.status(StatusCodes.OK).json({ product });
 };
+
+
+
 const deleteProduct = async (req, res) => {
-  res.send("Delete Products");
+  const { id: productId } = req.params;
+  const product = await Product.findOne({ _id: productId });
+  if (!product) {
+    throw new CustomError.NotFoundError(`No product with id : ${productId}`);
+  }
+  await product.remove();
+  res.status(StatusCodes.OK).json({ msg: "Success! Product removed." });
 };
+
+
+
+
 
 const uploadImage = async (req, res) => {
   if (!req.files) {
-    throw new CustomApi.BadRequestError("Provide images");
+    throw new CustomError.BadRequestError("No File Uploaded");
   }
-  let images = req.files.image;
-  console.log(images);
+  const productImage = req.files.image;
+  console.log(productImage);
+
   let urls = [];
-  for (let i = 0; i < images.length; i++) {
-    const element = images[i];
+  for (let i = 0; i < productImage.length; i++) {
+    const element = productImage[i];
+    if (!element.mimetype.startsWith("image")) {
+      throw new CustomError.BadRequestError("Please Upload Image");
+    }
+
+    const maxSize = 1024 * 1024;
+
+    if (element.size > maxSize) {
+      throw new CustomError.BadRequestError(
+        "Please upload image smaller than 1MB"
+      );
+    }
     const result = await cloudinary.uploader.upload(element.tempFilePath, {
       use_filename: true,
       folder: "images",

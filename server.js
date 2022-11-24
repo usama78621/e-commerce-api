@@ -11,6 +11,7 @@ const connectDB = require("./db/connect");
 const authRouter = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 // cloudinary
 const fileUpload = require("express-fileupload");
@@ -34,6 +35,7 @@ app.use(fileUpload({ useTempFiles: true }));
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/review", reviewRoutes);
 
 // not found page
 app.use(notFound);
