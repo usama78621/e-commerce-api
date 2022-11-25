@@ -14,6 +14,12 @@ const productRoutes = require("./routes/productRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 
+// sectry package
+
+const rateLimiter = require("express-rate-limit");
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const mongoSanitize = require("express-mongo-sanitize");
 
 // cloudinary
 const fileUpload = require("express-fileupload");
@@ -29,6 +35,17 @@ const errorHandlerMiddleware = require("./middleware/error-handler");
 const notFound = require("./middleware/not-found");
 const cookieParser = require("cookie-parser");
 // express incomeing req and res in json
+app.set("trust proxy", 1);
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 60,
+  })
+);
+
+app.use(helmet());
+app.use(xss());
+app.use(mongoSanitize());
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(cors());
@@ -39,7 +56,6 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
 app.use("/api/v1/orders", orderRoutes);
-
 
 // not found page
 app.use(notFound);
